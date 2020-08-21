@@ -205,7 +205,11 @@ export function createAppAPI<HostElement>(
         context.directives[name] = directive
         return app
       },
-
+      /**
+       * @param gyw
+       * mount 主要实现了两个点: 1、创建根组件的vnode 2、渲染这个vnode
+       * render和hydrate的区别就是 是否需要复用container里面的dom节点
+       */
       mount(rootContainer: HostElement, isHydrate?: boolean): any {
         if (!isMounted) {
           const vnode = createVNode(rootComponent as Component, rootProps)
