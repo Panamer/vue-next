@@ -21,6 +21,13 @@ declare module '@vue/reactivity' {
   }
 }
 
+/**
+ * gyw
+ * export const extend = Object.assign
+ * rendererOptions 看上去很费解 其实是合并对象 返回一个object
+ * nodeOps 是什么呢? 一个DOM API操作的上层封装, 在vue的生态中 我们称之为平台特性
+ * 未来想在其他平台上
+ */
 const rendererOptions = extend({ patchProp, forcePatchProp }, nodeOps)
 
 // lazy create the renderer - this makes core renderer logic tree-shakable
@@ -29,6 +36,12 @@ let renderer: Renderer<Element> | HydrationRenderer
 
 let enabledHydration = false
 
+/**
+ * 定义ensureRenderer
+ * 如果 renderer 不存在就调用 createRenderer 创建 renderer
+ * createRenderer来自于 @vue/runtime-core
+ *
+ */
 function ensureRenderer() {
   return renderer || (renderer = createRenderer<Node, Element>(rendererOptions))
 }
@@ -50,6 +63,10 @@ export const hydrate = ((...args) => {
   ensureHydrationRenderer().hydrate(...args)
 }) as RootHydrateFunction
 
+/**
+ *  入口文件 定义createApp方法
+ *  调用ensureRenderer方法 返回值中的createApp
+ */
 export const createApp = ((...args) => {
   const app = ensureRenderer().createApp(...args)
 

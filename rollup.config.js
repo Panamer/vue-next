@@ -114,6 +114,9 @@ function createConfig(format, output, plugins = []) {
   // during a single build.
   hasTSChecked = true
 
+  /**
+   * gyw 有 runtime.* 文件就用runtime没有就用 index.ts
+   */
   const entryFile = /runtime$/.test(format) ? `src/runtime.ts` : `src/index.ts`
 
   const external =
@@ -153,6 +156,10 @@ function createConfig(format, output, plugins = []) {
       : []
 
   return {
+    /**
+     * gyw
+     * resolve 是封装的路径拼接方法 会指向packages下的 vue目录
+     */
     input: resolve(entryFile),
     // Global and Browser ESM builds inlines everything so that they can be
     // used alone.

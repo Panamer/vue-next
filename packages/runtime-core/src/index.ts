@@ -70,7 +70,7 @@ export { withDirectives } from './directives'
 export { useSSRContext, ssrContextKey } from './helpers/useSsrContext'
 
 // Custom Renderer API ---------------------------------------------------------
-
+// 又发现 createRenderer 来源于 renderer 文件
 export { createRenderer, createHydrationRenderer } from './renderer'
 export { queuePostFlushCb } from './scheduler'
 export { warn } from './warning'

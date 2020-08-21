@@ -368,6 +368,16 @@ export const setRef = (
  *   ...nodeOps
  * })
  * ```
+ * gyw
+ * createRenderer函数接受两个通用参数, HostNode and HostElement
+ * return baseCreateRenderer
+ * baseCreateRenderer 函数重载 with? hydration
+ * return {
+    render,
+    hydrate,
+    createApp: createAppAPI(render, hydrate)
+  }
+ * 拿到render createApp
  */
 export function createRenderer<
   HostNode = RendererNode,
