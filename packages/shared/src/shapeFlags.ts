@@ -1,3 +1,7 @@
+/**
+ * ShapeFlags 是通过位运算得到的数字 这么做有什么优势呢
+ * 对于复合类型的类比会很简单  具体可以了解位运算
+ */
 export const enum ShapeFlags {
   ELEMENT = 1,
   FUNCTIONAL_COMPONENT = 1 << 1,

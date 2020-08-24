@@ -43,6 +43,7 @@ export const Fragment = (Symbol(__DEV__ ? 'Fragment' : undefined) as any) as {
     $props: VNodeProps
   }
 }
+// 特定标识符
 export const Text = Symbol(__DEV__ ? 'Text' : undefined)
 export const Comment = Symbol(__DEV__ ? 'Comment' : undefined)
 export const Static = Symbol(__DEV__ ? 'Static' : undefined)

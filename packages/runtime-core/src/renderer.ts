@@ -447,6 +447,7 @@ function baseCreateRenderer(
     optimized = false
   ) => {
     // patching & not same type, unmount old tree
+    // gyw 对于前后节点类型不同的情况, vue直接卸载旧的然后重新渲染新的 不会考虑复用自节点
     if (n1 && !isSameVNodeType(n1, n2)) {
       anchor = getNextHostNode(n1)
       unmount(n1, parentComponent, parentSuspense, true)
@@ -457,15 +458,18 @@ function baseCreateRenderer(
       optimized = false
       n2.dynamicChildren = null
     }
-
+    // gyw 根据节点类型的不同 执行 不同的process方法
     const { type, ref, shapeFlag } = n2
     switch (type) {
+      // 文本
       case Text:
         processText(n1, n2, container, anchor)
         break
+      // 注释
       case Comment:
         processCommentNode(n1, n2, container, anchor)
         break
+      // 静态节点
       case Static:
         if (n1 == null) {
           mountStaticNode(n2, container, anchor, isSVG)
@@ -473,6 +477,7 @@ function baseCreateRenderer(
           patchStaticNode(n1, n2, container, isSVG)
         }
         break
+      // Fragment片段
       case Fragment:
         processFragment(
           n1,
@@ -486,6 +491,7 @@ function baseCreateRenderer(
         )
         break
       default:
+        // 原声节点 div 等
         if (shapeFlag & ShapeFlags.ELEMENT) {
           processElement(
             n1,
@@ -497,6 +503,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
+        // 组件节点
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
           processComponent(
             n1,
@@ -508,6 +515,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
+        // 传送节点 
         } else if (shapeFlag & ShapeFlags.TELEPORT) {
           ;(type as typeof TeleportImpl).process(
             n1 as TeleportVNode,
@@ -520,6 +528,7 @@ function baseCreateRenderer(
             optimized,
             internals
           )
+        // 挂起节点 异步渲染
         } else if (__FEATURE_SUSPENSE__ && shapeFlag & ShapeFlags.SUSPENSE) {
           ;(type as typeof SuspenseImpl).process(
             n1,
@@ -2148,7 +2157,11 @@ function baseCreateRenderer(
       }
     }
   }
-
+  /**
+   * gyw render方法 这里调用了 patch 组件渲染的关键所在
+   * 根据 节点类型、是否初次渲染 来执行不同的操作
+   * 代码: runtime-core -> renderer.ts ->  baseCreateRenderer 
+   */
   const render: RootRenderFunction = (vnode, container) => {
     if (vnode == null) {
       if (container._vnode) {

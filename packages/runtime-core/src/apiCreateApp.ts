@@ -209,6 +209,7 @@ export function createAppAPI<HostElement>(
        * @param gyw
        * mount 主要实现了两个点: 1、创建根组件的vnode 2、渲染这个vnode
        * render和hydrate的区别就是 是否需要复用container里面的dom节点
+       * render 是 renderer.ts 中的 RootRenderFunction
        */
       mount(rootContainer: HostElement, isHydrate?: boolean): any {
         if (!isMounted) {
@@ -223,7 +224,7 @@ export function createAppAPI<HostElement>(
               render(cloneVNode(vnode), rootContainer)
             }
           }
-
+          // render 和 hydrate的区别就是是否需要复用 container里面的dom节点
           if (isHydrate && hydrate) {
             hydrate(vnode as VNode<Node, Element>, rootContainer as any)
           } else {
