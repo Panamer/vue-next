@@ -348,44 +348,71 @@ export function createComponentInstance(
 ) {
   const type = vnode.type as Component
   // inherit parent app context - or - if root, adopt from root vnode
+  // 继承父组件实例上的 app context 如果是根组件 则直接从根 vnode 中取
   const appContext =
     (parent ? parent.appContext : vnode.appContext) || emptyAppContext
 
   const instance: ComponentInternalInstance = {
+    // 组件唯一 id
     uid: uid++,
+    // 组件 vnode
     vnode,
     type,
+    // 父组件
     parent,
+    // 上下文
     appContext,
+    // 根组件实例
     root: null!, // to be immediately set
+    // 新的组件 vnode
     next: null,
+    // 自节点 vnode
     subTree: null!, // will be set synchronously right after creation
+    // 带副作用更新函数
     update: null!, // will be set synchronously right after creation
+    // 渲染函数
     render: null,
+    // 渲染上下文代理
     proxy: null,
+    // 带有with区块的渲染上下文代理
     withProxy: null,
+    // 响应式相关对象
     effects: null,
+    // 依赖注入相关
     provides: parent ? parent.provides : Object.create(appContext.provides),
+    // 渲染代理的属性访问缓存
     accessCache: null!,
+    // 渲染缓存
     renderCache: [],
 
     // state
+    // 渲染上下文
     ctx: EMPTY_OBJ,
+    // data数据
     data: EMPTY_OBJ,
+    // props数据
     props: EMPTY_OBJ,
+    // 普通属性
     attrs: EMPTY_OBJ,
+    // 插槽相关
     slots: EMPTY_OBJ,
+    // 组件或者dom的ref引用
     refs: EMPTY_OBJ,
+    // setup 函数返回的响应式结果
     setupState: EMPTY_OBJ,
+    // setup函数上下文数据
     setupContext: null,
 
     // suspense related
     suspense,
+    // 异步依赖
     asyncDep: null,
+    // 异步依赖是否都已处理
     asyncResolved: false,
 
     // lifecycle hooks
     // not using enums here because it results in computed properties
+
     isMounted: false,
     isUnmounted: false,
     isDeactivated: false,
@@ -449,12 +476,23 @@ export function setupComponent(
   isSSR = false
 ) {
   isInSSRComponentSetup = isSSR
-
+  /**
+   * gyw
+   */
   const { props, children, shapeFlag } = instance.vnode
+  // 判断是否是一个有状态的组件
   const isStateful = shapeFlag & ShapeFlags.STATEFUL_COMPONENT
+  // 根据组件的props声明来把属性放到props或者attrs里面
+  // 根据声明的props进行校验
+  // 初始化props
   initProps(instance, props, isStateful, isSSR)
+  // 初始化插槽
   initSlots(instance, children)
-
+  /**
+   * 设置有状态的组件实例
+   * 有状态组件才会执行setupStatefulComponent
+   * 函数组件并没有setup
+   */
   const setupResult = isStateful
     ? setupStatefulComponent(instance, isSSR)
     : undefined
@@ -486,14 +524,16 @@ function setupStatefulComponent(
     }
   }
   // 0. create render proxy property access cache
+  // 创建渲染代理的属性访问缓存
   instance.accessCache = {}
   // 1. create public instance / render proxy
   // also mark it raw so it's never observed
+  // 创建渲染上下文代理
   instance.proxy = new Proxy(instance.ctx, PublicInstanceProxyHandlers)
   if (__DEV__) {
     exposePropsOnRenderContext(instance)
   }
-  // 2. call setup()
+  // 2. call setup() 判断处理setup函数
   const { setup } = Component
   if (setup) {
     const setupContext = (instance.setupContext =

@@ -503,7 +503,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
-        // 组件节点
+          // 组件节点
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
           processComponent(
             n1,
@@ -515,7 +515,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
-        // 传送节点 
+          // 传送节点
         } else if (shapeFlag & ShapeFlags.TELEPORT) {
           ;(type as typeof TeleportImpl).process(
             n1 as TeleportVNode,
@@ -528,7 +528,7 @@ function baseCreateRenderer(
             optimized,
             internals
           )
-        // 挂起节点 异步渲染
+          // 挂起节点 异步渲染
         } else if (__FEATURE_SUSPENSE__ && shapeFlag & ShapeFlags.SUSPENSE) {
           ;(type as typeof SuspenseImpl).process(
             n1,
@@ -1187,6 +1187,7 @@ function baseCreateRenderer(
     isSVG,
     optimized
   ) => {
+    // 创建组件实例
     const instance: ComponentInternalInstance = (initialVNode.component = createComponentInstance(
       initialVNode,
       parentComponent,
@@ -1211,6 +1212,8 @@ function baseCreateRenderer(
     if (__DEV__) {
       startMeasure(instance, `init`)
     }
+    // gyw
+    // 设置组件实例 initProps initSlots setupStatefulComponent
     setupComponent(instance)
     if (__DEV__) {
       endMeasure(instance, `init`)
@@ -1233,7 +1236,7 @@ function baseCreateRenderer(
       }
       return
     }
-
+    // 设置并运行带副作用的渲染函数
     setupRenderEffect(
       instance,
       initialVNode,
@@ -2160,7 +2163,7 @@ function baseCreateRenderer(
   /**
    * gyw render方法 这里调用了 patch 组件渲染的关键所在
    * 根据 节点类型、是否初次渲染 来执行不同的操作
-   * 代码: runtime-core -> renderer.ts ->  baseCreateRenderer 
+   * 代码: runtime-core -> renderer.ts ->  baseCreateRenderer
    */
   const render: RootRenderFunction = (vnode, container) => {
     if (vnode == null) {
