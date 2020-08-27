@@ -412,38 +412,57 @@ export function createComponentInstance(
 
     // lifecycle hooks
     // not using enums here because it results in computed properties
-
+    // 是否挂载
     isMounted: false,
+    // 是否卸载
     isUnmounted: false,
+    // 是否激活
     isDeactivated: false,
+    // 声明周期  before create
     bc: null,
+    // 声明周期 created
     c: null,
+    // 声明周期 before mount
     bm: null,
+    // 声明周期 mounted
     m: null,
+    // 声明周期 before update
     bu: null,
+    // 声明周期 updated
     u: null,
+    // 声明周期 unmounted
     um: null,
+    // 声明周期 before unmount
     bum: null,
+    // 声明周期 deactivated
     da: null,
+    // 声明周期 activated
     a: null,
+    // 声明周期 render triggered
     rtg: null,
+    // 声明周期 render tracked
     rtc: null,
+    // 声明周期 error captured
     ec: null,
+    // 派发事件方法
     emit: null as any, // to be set immediately
     emitted: null
   }
+  // 初始化渲染上下文
   if (__DEV__) {
     instance.ctx = createRenderContext(instance)
   } else {
     instance.ctx = { _: instance }
   }
+  // 初始化根组件指针
   instance.root = parent ? parent.root : instance
+  // 初始化派发事件的方法
   instance.emit = emit.bind(null, instance)
 
   if (__DEV__ || __FEATURE_PROD_DEVTOOLS__) {
     devtoolsComponentAdded(instance)
   }
-
+  // 返回根组件
   return instance
 }
 
