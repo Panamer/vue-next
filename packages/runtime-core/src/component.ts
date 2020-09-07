@@ -497,6 +497,7 @@ export function setupComponent(
   isInSSRComponentSetup = isSSR
   /**
    * gyw
+   * 获取组件属性 孩子
    */
   const { props, children, shapeFlag } = instance.vnode
   // 判断是否是一个有状态的组件
@@ -523,6 +524,7 @@ function setupStatefulComponent(
   instance: ComponentInternalInstance,
   isSSR: boolean
 ) {
+  // 组件选项
   const Component = instance.type as ComponentOptions
 
   if (__DEV__) {
@@ -679,6 +681,7 @@ function finishComponentSetup(
   }
 
   // support for 2.x options
+  // gyw 兼容vue2 版本
   if (__FEATURE_OPTIONS_API__) {
     currentInstance = instance
     applyOptions(instance, Component)

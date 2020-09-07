@@ -107,7 +107,11 @@ export type CreateAppFunction<HostElement> = (
   rootComponent: PublicAPIComponent,
   rootProps?: Data | null
 ) => App<HostElement>
-
+/**
+ * 工厂函数 gyw 返回createApp函数的函数
+ * @param render
+ * @param hydrate
+ */
 export function createAppAPI<HostElement>(
   render: RootRenderFunction,
   hydrate?: RootHydrateFunction
@@ -122,7 +126,10 @@ export function createAppAPI<HostElement>(
     const installedPlugins = new Set()
 
     let isMounted = false
-
+    /**
+     * gyw
+     * vue实例对象
+     */
     const app: App = (context.app = {
       _component: rootComponent as Component,
       _props: rootProps,
@@ -228,6 +235,7 @@ export function createAppAPI<HostElement>(
           if (isHydrate && hydrate) {
             hydrate(vnode as VNode<Node, Element>, rootContainer as any)
           } else {
+            // 调用传进来的 render 函数 将vnode渲染到根容器上rootContainer : #app
             render(vnode, rootContainer)
           }
           isMounted = true

@@ -9,7 +9,7 @@ if (!process.env.TARGET) {
 
 const masterVersion = require('./package.json').version
 const packagesDir = path.resolve(__dirname, 'packages')
-const packageDir = path.resolve(packagesDir, process.env.TARGET)
+const packageDir = path.resolve(packagesDir, process.env.TARGET) //  TARGET is vue
 const name = path.basename(packageDir)
 const resolve = p => path.resolve(packageDir, p)
 const pkg = require(resolve(`package.json`))
@@ -115,10 +115,12 @@ function createConfig(format, output, plugins = []) {
   hasTSChecked = true
 
   /**
-   * gyw 有 runtime.* 文件就用runtime没有就用 index.ts
+   * gyw vue/src下有 runtime.global 文件就用runtime.ts没有就用 index.ts
+   * format: global
+   * entryFile: src/index.ts  index包含了runtime版本的代码
    */
   const entryFile = /runtime$/.test(format) ? `src/runtime.ts` : `src/index.ts`
-
+  console.log(`format: ${format},   entryFile: ${entryFile}`)
   const external =
     isGlobalBuild || isBrowserESMBuild
       ? packageOptions.enableNonBrowserBranches

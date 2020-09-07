@@ -37,10 +37,10 @@ let renderer: Renderer<Element> | HydrationRenderer
 let enabledHydration = false
 
 /**
- * 定义ensureRenderer
+ * 定义ensureRenderer 获取一个渲染器
  * 如果 renderer 不存在就调用 createRenderer 创建 renderer
  * createRenderer来自于 @vue/runtime-core
- *
+ * 单例模式
  */
 function ensureRenderer() {
   return renderer || (renderer = createRenderer<Node, Element>(rendererOptions))
@@ -66,18 +66,20 @@ export const hydrate = ((...args) => {
 /**
  *  入口文件 定义createApp方法
  *  调用ensureRenderer方法 返回值中的createApp
+ *  创建vue实例的工厂函数
  */
 export const createApp = ((...args) => {
+  // 渲染器 renderer 创建实例
   const app = ensureRenderer().createApp(...args)
 
   if (__DEV__) {
     injectNativeTagCheck(app)
   }
-/**
- * gyw 这里并不是重新实现了mount 而是提取了一些平台相关的逻辑出来
- * 比如读取内部html作为模版 runtime-core并不知道平台特性
- * 但是核心代码代码还是在core目录下
- */
+  /**
+   * gyw 这里并不是重新实现了mount 而是提取了一些平台相关的逻辑出来
+   * 比如读取内部html作为模版 runtime-core并不知道平台特性
+   * 但是核心代码代码还是在core目录下
+   */
   const { mount } = app
   app.mount = (containerOrSelector: Element | string): any => {
     const container = normalizeContainer(containerOrSelector)

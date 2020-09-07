@@ -7,10 +7,11 @@ import * as runtimeDom from '@vue/runtime-dom'
 import { isString, NOOP, generateCodeFrame, extend } from '@vue/shared'
 import { InternalRenderFunction } from 'packages/runtime-core/src/component'
 
+// 如果是dev环境 调用initDev  无关紧要
 __DEV__ && initDev()
-
+// 缓存render函数
 const compileCache: Record<string, RenderFunction> = Object.create(null)
-
+// 根据模版生成render函数 返回render
 function compileToFunction(
   template: string | HTMLElement,
   options?: CompilerOptions
@@ -81,8 +82,10 @@ function compileToFunction(
 
   return (compileCache[key] = render)
 }
-
+// 注册编译器  组件设置完成以后调用compile
 registerRuntimeCompiler(compileToFunction)
 
+// 对外暴露以下方法 compile runtime-dom
+// runtime-dom 暴露 createApp createSSRApp 等API
 export { compileToFunction as compile }
 export * from '@vue/runtime-dom'

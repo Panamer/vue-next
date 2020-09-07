@@ -394,7 +394,10 @@ export function createHydrationRenderer(
 ) {
   return baseCreateRenderer(options, createHydrationFunctions)
 }
-
+/**
+ * ts的函数重载
+ * @param baseCreateRenderer
+ */
 // overload 1: no hydration
 function baseCreateRenderer<
   HostNode = RendererNode,
@@ -407,7 +410,7 @@ function baseCreateRenderer(
   createHydrationFns: typeof createHydrationFunctions
 ): HydrationRenderer
 
-// implementation
+// implementation   1800行的函数 😄😄
 function baseCreateRenderer(
   options: RendererOptions,
   createHydrationFns?: typeof createHydrationFunctions
@@ -437,8 +440,8 @@ function baseCreateRenderer(
   // Note: functions inside this closure should use `const xxx = () => {}`
   // style in order to prevent being inlined by minifiers.
   const patch: PatchFn = (
-    n1,
-    n2,
+    n1, // 旧 vnode
+    n2, // 新 vnode
     container,
     anchor = null,
     parentComponent = null,
@@ -503,7 +506,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
-          // 组件节点
+          // 组件节点 初始化走这个逻辑
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
           processComponent(
             n1,
@@ -1153,6 +1156,7 @@ function baseCreateRenderer(
     isSVG: boolean,
     optimized: boolean
   ) => {
+    // 初始化 没有旧节点
     if (n1 == null) {
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
         ;(parentComponent!.ctx as KeepAliveContext).activate(
@@ -1163,6 +1167,7 @@ function baseCreateRenderer(
           optimized
         )
       } else {
+        // 首次挂载组件
         mountComponent(
           n2,
           container,
@@ -1298,7 +1303,9 @@ function baseCreateRenderer(
     optimized
   ) => {
     // create reactive effect for rendering
+    // effect函数的返回值  组件实例的更新函数
     instance.update = effect(function componentEffect() {
+      // 并未挂载  初始化
       if (!instance.isMounted) {
         let vnodeHook: VNodeHook | null | undefined
         const { el, props } = initialVNode
@@ -1336,6 +1343,7 @@ function baseCreateRenderer(
           if (__DEV__) {
             startMeasure(instance, `patch`)
           }
+          // 首次dom转换
           patch(
             null,
             subTree,
@@ -2161,16 +2169,19 @@ function baseCreateRenderer(
     }
   }
   /**
-   * gyw render方法 这里调用了 patch 组件渲染的关键所在
+   * gyw render渲染函数 这里调用了 patch 组件渲染的关键所在
    * 根据 节点类型、是否初次渲染 来执行不同的操作
    * 代码: runtime-core -> renderer.ts ->  baseCreateRenderer
+   * 将传入的vnode转换成node, 追加到 container 中
    */
   const render: RootRenderFunction = (vnode, container) => {
+    // 删除逻辑
     if (vnode == null) {
       if (container._vnode) {
         unmount(container._vnode, null, null, true)
       }
     } else {
+      // 更新 初始化  逻辑
       patch(container._vnode || null, vnode, container)
     }
     flushPostFlushCbs()
@@ -2198,7 +2209,10 @@ function baseCreateRenderer(
       Element
     >)
   }
-
+  /**
+   * 渲染器 是个对象 { render,  createApp }
+   * render 声明了一个渲染函数  它可以转换 vnode 成真实节点
+   */
   return {
     render,
     hydrate,
