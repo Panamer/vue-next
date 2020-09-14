@@ -115,8 +115,9 @@ function createConfig(format, output, plugins = []) {
   hasTSChecked = true
 
   /**
-   * gyw vue/src下有 runtime.global 文件就用runtime.ts没有就用 index.ts
-   * format: global
+   * gyw 
+   * 如果 format 是 runtime  入口文件就用runtime.ts没有就用 index.ts
+   * format: global 这里检测到 format 是 global
    * entryFile: src/index.ts  index包含了runtime版本的代码
    */
   const entryFile = /runtime$/.test(format) ? `src/runtime.ts` : `src/index.ts`

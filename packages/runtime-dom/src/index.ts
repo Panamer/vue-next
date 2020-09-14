@@ -82,9 +82,11 @@ export const createApp = ((...args) => {
    */
   const { mount } = app
   app.mount = (containerOrSelector: Element | string): any => {
+    // 初始化容器 container 可能是元素选择器 或者是 开发者传入的内容
     const container = normalizeContainer(containerOrSelector)
     if (!container) return
     const component = app._component
+    // 如果component不是函数式组件 没有render函数 也没有template默认 默认会取标签内的内容
     if (!isFunction(component) && !component.render && !component.template) {
       component.template = container.innerHTML
     }

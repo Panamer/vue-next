@@ -1,3 +1,4 @@
+// 这个入口是完全构建 其中包含了 runtime 和 compile 版本的代码
 // This entry is the "full-build" that includes both the runtime
 // and the compiler, and supports on-the-fly compilation of the template option.
 import { initDev } from './dev'
@@ -11,7 +12,7 @@ import { InternalRenderFunction } from 'packages/runtime-core/src/component'
 __DEV__ && initDev()
 // 缓存render函数
 const compileCache: Record<string, RenderFunction> = Object.create(null)
-// 根据模版生成render函数 返回render
+// 根据模版生成render函数 返回 compileCache[key] = render
 function compileToFunction(
   template: string | HTMLElement,
   options?: CompilerOptions
@@ -86,6 +87,7 @@ function compileToFunction(
 registerRuntimeCompiler(compileToFunction)
 
 // 对外暴露以下方法 compile runtime-dom
-// runtime-dom 暴露 createApp createSSRApp 等API
+// runtime-dom 定义 ensureRenderer 暴露 render、 hydrate、createApp、createSSRApp
+// runtime-dom 同时 暴露 directives、components、runtime-core 内的所有方法 (响应式reactive、声明周期、createApp createSSRApp 等 Vue 下面的 所有API)
 export { compileToFunction as compile }
 export * from '@vue/runtime-dom'
