@@ -41,7 +41,7 @@ export {
 } from './apiLifecycle'
 export { provide, inject } from './apiInject'
 export { nextTick } from './scheduler'
-export { defineComponent } from './apiDefineComponent'
+export { defineComponent, DefineComponent } from './apiDefineComponent'
 export { defineAsyncComponent } from './apiAsyncComponent'
 
 // Advanced API ----------------------------------------------------------------
@@ -159,6 +159,7 @@ export {
 } from './vnode'
 export {
   Component,
+  ConcreteComponent,
   FunctionalComponent,
   ComponentInternalInstance,
   SetupContext,
@@ -178,7 +179,7 @@ export {
 export {
   ComponentPublicInstance,
   ComponentCustomProperties
-} from './componentProxy'
+} from './componentPublicInstance'
 export {
   Renderer,
   RendererNode,
@@ -249,7 +250,6 @@ import {
   setCurrentRenderingInstance
 } from './componentRenderUtils'
 import { isVNode, normalizeVNode } from './vnode'
-import { normalizeSuspenseChildren } from './components/Suspense'
 
 const _ssrUtils = {
   createComponentInstance,
@@ -257,8 +257,7 @@ const _ssrUtils = {
   renderComponentRoot,
   setCurrentRenderingInstance,
   isVNode,
-  normalizeVNode,
-  normalizeSuspenseChildren
+  normalizeVNode
 }
 
 /**

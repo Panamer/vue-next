@@ -23,11 +23,19 @@ createRenderer函数接受两个通用参数, HostNode and HostElement
 
 return baseCreateRenderer
 
+<<<<<<< HEAD
 baseCreateRenderer 函数重载 with? hydration
 
 return { render, hydrate, createApp: createAppAPI(render, hydrate) }
 
 拿到render createApp
+=======
+- [![beta](https://img.shields.io/npm/v/vue-router/next.svg)](https://www.npmjs.com/package/vue-router/v/next)
+- [Github](https://github.com/vuejs/vue-router-next)
+- [RFCs](https://github.com/vuejs/rfcs/pulls?q=is%3Apr+is%3Amerged+label%3Arouter)
+
+### Vuex
+>>>>>>> 7449c7626debbdbeb87c7828920206fe620ebfd4
 
 packages/runtime-core/src/apiCreateApp.ts
 
@@ -50,5 +58,10 @@ effect                      effect.ts:63
 reactiveEffect              effect.ts:94
 componentEffect             renderer.ts:1234
 
+<<<<<<< HEAD
+=======
+- [vuejs/jsx-next](https://github.com/vuejs/jsx-next)
+- [HcySunYang/vue-next-jsx](https://github.com/HcySunYang/vue-next-jsx)
+>>>>>>> 7449c7626debbdbeb87c7828920206fe620ebfd4
 
 app.mount ----> mount -----> render ----> patch ----> 

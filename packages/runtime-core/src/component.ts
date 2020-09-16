@@ -7,30 +7,37 @@ import {
   proxyRefs
 } from '@vue/reactivity'
 import {
-  CreateComponentPublicInstance,
   ComponentPublicInstance,
   PublicInstanceProxyHandlers,
   RuntimeCompiledPublicInstanceProxyHandlers,
   createRenderContext,
   exposePropsOnRenderContext,
-  exposeSetupStateOnRenderContext
-} from './componentProxy'
+  exposeSetupStateOnRenderContext,
+  ComponentPublicInstanceConstructor
+} from './componentPublicInstance'
 import {
   ComponentPropsOptions,
   NormalizedPropsOptions,
-  initProps
+  initProps,
+  normalizePropsOptions
 } from './componentProps'
 import { Slots, initSlots, InternalSlots } from './componentSlots'
 import { warn } from './warning'
 import { ErrorCodes, callWithErrorHandling } from './errorHandling'
 import { AppContext, createAppContext, AppConfig } from './apiCreateApp'
-import { validateDirectiveName } from './directives'
-import { applyOptions, ComponentOptions } from './componentOptions'
+import { Directive, validateDirectiveName } from './directives'
+import {
+  applyOptions,
+  ComponentOptions,
+  ComputedOptions,
+  MethodOptions
+} from './componentOptions'
 import {
   EmitsOptions,
   ObjectEmitsOptions,
   EmitFn,
-  emit
+  emit,
+  normalizeEmitsOptions
 } from './componentEmits'
 import {
   EMPTY_OBJ,
@@ -72,11 +79,11 @@ export interface ComponentInternalOptions {
   /**
    * @internal
    */
-  __props?: NormalizedPropsOptions | []
+  __props?: Record<number, NormalizedPropsOptions>
   /**
    * @internal
    */
-  __emits?: ObjectEmitsOptions
+  __emits?: Record<number, ObjectEmitsOptions | null>
   /**
    * @internal
    */
@@ -110,21 +117,35 @@ export interface ClassComponent {
   __vccOpts: ComponentOptions
 }
 
-export type Component = ComponentOptions | FunctionalComponent<any>
+/**
+ * Concrete component type matches its actual value: it's either an options
+ * object, or a function. Use this where the code expects to work with actual
+ * values, e.g. checking if its a function or not. This is mostly for internal
+ * implementation code.
+ */
+export type ConcreteComponent<
+  Props = {},
+  RawBindings = any,
+  D = any,
+  C extends ComputedOptions = ComputedOptions,
+  M extends MethodOptions = MethodOptions
+> =
+  | ComponentOptions<Props, RawBindings, D, C, M>
+  | FunctionalComponent<Props, any>
 
-// A type used in public APIs where a component type is expected.
-// The constructor type is an artificial type returned by defineComponent().
-export type PublicAPIComponent =
-  | Component
-  | {
-      new (...args: any[]): CreateComponentPublicInstance<
-        any,
-        any,
-        any,
-        any,
-        any
-      >
-    }
+/**
+ * A type used in public APIs where a component type is expected.
+ * The constructor type is an artificial type returned by defineComponent().
+ */
+export type Component<
+  Props = any,
+  RawBindings = any,
+  D = any,
+  C extends ComputedOptions = ComputedOptions,
+  M extends MethodOptions = MethodOptions
+> =
+  | ConcreteComponent<Props, RawBindings, D, C, M>
+  | ComponentPublicInstanceConstructor<Props>
 
 export { ComponentOptions }
 
@@ -174,7 +195,7 @@ export type InternalRenderFunction = {
  */
 export interface ComponentInternalInstance {
   uid: number
-  type: Component
+  type: ConcreteComponent
   parent: ComponentInternalInstance | null
   root: ComponentInternalInstance
   appContext: AppContext
@@ -223,12 +244,30 @@ export interface ComponentInternalInstance {
    */
   renderCache: (Function | VNode)[]
 
-  // the rest are only for stateful components ---------------------------------
-
   /**
-   * main proxy that serves as the public instance (`this`)
+   * Resolved component registry, only for components with mixins or extends
    * @internal
    */
+  components: Record<string, ConcreteComponent> | null
+  /**
+   * Resolved directive registry, only for components with mixins or extends
+   * @internal
+   */
+  directives: Record<string, Directive> | null
+  /**
+   * reoslved props options
+   * @internal
+   */
+  propsOptions: NormalizedPropsOptions
+  /**
+   * resolved emits options
+   * @internal
+   */
+  emitsOptions: ObjectEmitsOptions | null
+
+  // the rest are only for stateful components ---------------------------------
+
+  // main proxy that serves as the public instance (`this`)
   proxy: ComponentPublicInstance | null
 
   /**
@@ -245,14 +284,17 @@ export interface ComponentInternalInstance {
    */
   ctx: Data
 
-  // internal state
+  // state
   data: Data
   props: Data
   attrs: Data
   slots: InternalSlots
   refs: Data
   emit: EmitFn
-  // used for keeping track of .once event handlers on components
+  /**
+   * used for keeping track of .once event handlers on components
+   * @internal
+   */
   emitted: Record<string, boolean> | null
 
   /**
@@ -260,6 +302,11 @@ export interface ComponentInternalInstance {
    * @internal
    */
   setupState: Data
+  /**
+   * devtools access to additional info
+   * @internal
+   */
+  devtoolsRawSetupState?: any
   /**
    * @internal
    */
@@ -270,6 +317,11 @@ export interface ComponentInternalInstance {
    * @internal
    */
   suspense: SuspenseBoundary | null
+  /**
+   * suspense pending batch id
+   * @internal
+   */
+  suspenseId: number
   /**
    * @internal
    */
@@ -346,7 +398,7 @@ export function createComponentInstance(
   parent: ComponentInternalInstance | null,
   suspense: SuspenseBoundary | null
 ) {
-  const type = vnode.type as Component
+  const type = vnode.type as ConcreteComponent
   // inherit parent app context - or - if root, adopt from root vnode
   // 继承父组件实例上的 app context 如果是根组件 则直接从根 vnode 中取
   const appContext =
@@ -385,6 +437,18 @@ export function createComponentInstance(
     // 渲染缓存
     renderCache: [],
 
+    // local resovled assets
+    components: null,
+    directives: null,
+
+    // resolved props and emits options
+    propsOptions: normalizePropsOptions(type, appContext),
+    emitsOptions: normalizeEmitsOptions(type, appContext),
+
+    // emit
+    emit: null as any, // to be set immediately
+    emitted: null,
+
     // state
     // 渲染上下文
     ctx: EMPTY_OBJ,
@@ -405,7 +469,7 @@ export function createComponentInstance(
 
     // suspense related
     suspense,
-    // 异步依赖
+    suspenseId: suspense ? suspense.pendingId : 0,
     asyncDep: null,
     // 异步依赖是否都已处理
     asyncResolved: false,
@@ -443,10 +507,7 @@ export function createComponentInstance(
     // 声明周期 render tracked
     rtc: null,
     // 声明周期 error captured
-    ec: null,
-    // 派发事件方法
-    emit: null as any, // to be set immediately
-    emitted: null
+    ec: null
   }
   // 初始化渲染上下文
   if (__DEV__) {
@@ -613,6 +674,9 @@ export function handleSetupResult(
     }
     // setup returned bindings.
     // assuming a render function compiled from template is present.
+    if (__DEV__ || __FEATURE_PROD_DEVTOOLS__) {
+      instance.devtoolsRawSetupState = setupResult
+    }
     instance.setupState = proxyRefs(setupResult)
     if (__DEV__) {
       exposeSetupStateOnRenderContext(instance)
@@ -766,7 +830,7 @@ const classify = (str: string): string =>
 /* istanbul ignore next */
 export function formatComponentName(
   instance: ComponentInternalInstance | null,
-  Component: Component,
+  Component: ConcreteComponent,
   isRoot = false
 ): string {
   let name = isFunction(Component)
@@ -790,7 +854,8 @@ export function formatComponentName(
     }
     name =
       inferFromRegistry(
-        (instance.parent.type as ComponentOptions).components
+        instance.components ||
+          (instance.parent.type as ComponentOptions).components
       ) || inferFromRegistry(instance.appContext.components)
   }
 
