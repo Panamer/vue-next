@@ -456,7 +456,7 @@ function baseCreateRenderer(
       unmount(n1, parentComponent, parentSuspense, true)
       n1 = null
     }
-
+    // 表示一个节点的diff应该结束 BAIL === -2
     if (n2.patchFlag === PatchFlags.BAIL) {
       optimized = false
       n2.dynamicChildren = null
@@ -494,7 +494,7 @@ function baseCreateRenderer(
         )
         break
       default:
-        // 原声节点 div 等
+        // 原生节点 div 等    4 & 1 === 0   隐式转换是false
         if (shapeFlag & ShapeFlags.ELEMENT) {
           processElement(
             n1,
@@ -506,7 +506,7 @@ function baseCreateRenderer(
             isSVG,
             optimized
           )
-          // 组件节点 初始化走这个逻辑
+          // 组件节点 初始化走这个逻辑  4 & 6 === 4  隐式转换返回true
         } else if (shapeFlag & ShapeFlags.COMPONENT) {
           processComponent(
             n1,

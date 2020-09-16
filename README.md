@@ -44,9 +44,11 @@ render                      renderer.ts:2090
 patch                       renderer.ts:462
 processComponent            renderer.ts:1101
 mountComponent              renderer.ts:1172
+setupComponent
 setupRenderEffect           renderer.ts:1233
 effect                      effect.ts:63
 reactiveEffect              effect.ts:94
 componentEffect             renderer.ts:1234
 
 
+app.mount ----> mount -----> render ----> patch ----> 
