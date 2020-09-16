@@ -1,3 +1,7 @@
+安装依赖
+yarn --ignore-scripts
+dev: node scripts/dev.js --sourcemap
+
 Vue3.0 源码解析
 入口文件: entryFile = /runtime$/.test(format) ? src/runtime.ts : src/index.ts
 

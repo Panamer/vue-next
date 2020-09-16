@@ -129,6 +129,7 @@ export function createAppAPI<HostElement>(
     /**
      * gyw
      * vue实例对象
+     * 实例方法 静态方法 都挂载在实例对象上
      */
     const app: App = (context.app = {
       _component: rootComponent as Component,

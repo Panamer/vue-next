@@ -1156,7 +1156,7 @@ function baseCreateRenderer(
     isSVG: boolean,
     optimized: boolean
   ) => {
-    // 初始化 没有旧节点
+    // 说明是初始化 没有旧节点
     if (n1 == null) {
       if (n2.shapeFlag & ShapeFlags.COMPONENT_KEPT_ALIVE) {
         ;(parentComponent!.ctx as KeepAliveContext).activate(
@@ -2212,6 +2212,7 @@ function baseCreateRenderer(
   /**
    * 渲染器 是个对象 { render,  createApp }
    * render 声明了一个渲染函数  它可以转换 vnode 成真实节点
+   * hydrate 服务端渲染
    */
   return {
     render,

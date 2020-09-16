@@ -555,6 +555,7 @@ function setupStatefulComponent(
     exposePropsOnRenderContext(instance)
   }
   // 2. call setup() 判断处理setup函数
+  // composition-api 初始化
   const { setup } = Component
   if (setup) {
     const setupContext = (instance.setupContext =

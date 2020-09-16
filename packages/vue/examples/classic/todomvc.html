@@ -82,7 +82,7 @@ const filters = {
   }
 }
 
-Vue.createApp({
+const proxy = Vue.createApp({
   // app initial state
   data: () => ({
     todos: todoStorage.fetch(),
@@ -193,4 +193,5 @@ Vue.createApp({
     }
   }
 }).mount('#app')
+console.log('proxy is ', proxy);
 </script>
