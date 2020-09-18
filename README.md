@@ -41,15 +41,15 @@ patchFlags 和它的名字一样,它就是一系列标志的集合,来标示一�
 createApp 通过  ensureRenderer().createApp 生成app 
 ensureRenderer ----  createRenderer{} ----  createAppAPI(render, hydrate)  ---  app.mount  --- render() --- patch() ----   
 
-app.mount                   index.ts
-mount                       apiCreateApp.ts
-render                      renderer.ts:2090
-patch                       renderer.ts:462
-processComponent            renderer.ts:1101
-mountComponent              renderer.ts:1172
+app.mount                   index.ts           此app是createApp返回的 里面有个自己的mount方法, 渲染器也返回一个app 里面也有个针对平台的mount方法
+mount                       apiCreateApp.ts    mount 会 调用 传进来的render方法 
+render                      renderer.ts:2090   render内没有太多复杂的逻辑  调用了patch
+patch                       renderer.ts:462    patch 根据不同的节点类型 做不同的process加工处理操作
+processComponent            renderer.ts:1101   初始化时 执行时这个 按组件处理 触发mountComponent
+mountComponent              renderer.ts:1172   创建组件实例、 设置组件实例
 setupComponent
 setupRenderEffect           renderer.ts:1233    instance.update = effect()       patch()      
-effect                      effect.ts:63
+effect                      effect.ts:63        
 reactiveEffect              effect.ts:94
-componentEffect             renderer.ts:1234
+componentEffect             renderer.ts:1234    具名函数 effect的入参
 
