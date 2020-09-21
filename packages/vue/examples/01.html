@@ -1,0 +1,26 @@
+<div id="app">
+  <h2>reactive</h2>
+  <div @click="add"> {{ counter }} </div>
+</div>
+<script src="../dist/vue.global.js"></script>
+<script>
+ const { effect, createApp, reactive, toRefs}  = Vue;
+  // 这个createApp来自runtime-dom
+ createApp({
+   setup() {
+     const state = reactive({
+       counter: 0
+     })
+     function add() {
+       state.counter++
+     }
+
+     return {
+       ...toRefs(state),
+       add
+     }
+   }
+   
+ }).mount("#app")
+
+</script>

@@ -37,7 +37,7 @@ let renderer: Renderer<Element> | HydrationRenderer
 let enabledHydration = false
 
 /**
- * 定义ensureRenderer 获取一个渲染器
+ * 定义ensureRenderer 获取一个渲染器 返回render
  * 如果 renderer 不存在就调用 createRenderer 创建 renderer
  * createRenderer来自于 @vue/runtime-core
  * 单例模式
@@ -92,6 +92,7 @@ export const createApp = ((...args) => {
     }
     // clear content before mounting
     container.innerHTML = ''
+    // 这个mount是createApp返回的 mount 根据参数调用不同的render 和平台相关
     const proxy = mount(container)
     container.removeAttribute('v-cloak')
     container.setAttribute('data-v-app', '')

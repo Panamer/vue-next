@@ -48,8 +48,12 @@ patch                       renderer.ts:462    patch 根据不同的节点类型
 processComponent            renderer.ts:1101   初始化时 执行时这个 按组件处理 触发mountComponent
 mountComponent              renderer.ts:1172   创建组件实例、 设置组件实例
 setupComponent
-setupRenderEffect           renderer.ts:1233    instance.update = effect()       patch()      
-effect                      effect.ts:63        
-reactiveEffect              effect.ts:94
-componentEffect             renderer.ts:1234    具名函数 effect的入参
+setupRenderEffect           renderer.ts:1233   instance.update = effect()       patch()      
+effect                      effect.ts:63       相当于2.0的watch track trigger 分别负责依赖收集 依赖更新 
+reactiveEffect              effect.ts:94       高阶函数
+componentEffect             renderer.ts:1234   具名函数 effect的入参
 
+
+reactive({
+  // 调用 createReactiveObject 创建响应式对象  new Proxy() 拦截get、set 不区分数组、对象 取值时track 设置值时 trigger
+})

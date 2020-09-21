@@ -465,7 +465,7 @@ function baseCreateRenderer(
     optimized = false
   ) => {
     // patching & not same type, unmount old tree
-    // gyw 对于前后节点类型不同的情况, vue直接卸载旧的然后重新渲染新的 不会考虑复用自节点
+    // gyw 对于前后节点类型不同的情况, vue直接卸载旧的然后重新渲染新的 不会考虑复用子节点
     if (n1 && !isSameVNodeType(n1, n2)) {
       anchor = getNextHostNode(n1)
       unmount(n1, parentComponent, parentSuspense, true)
